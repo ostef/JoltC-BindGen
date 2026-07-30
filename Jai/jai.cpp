@@ -46,7 +46,7 @@ void AppendJaiType(const JaiGenerateOptions &options, StringBuilder &builder, Ty
             builder.Append("bool");
         } break;
         case Type_Char: {
-            builder.Append("s8");
+            builder.Append("u8");
         } break;
         case Type_UInt8: {
             builder.Append("u8");
