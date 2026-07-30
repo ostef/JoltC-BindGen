@@ -14,6 +14,8 @@ int main(int argc, char **argv) {
     }
 
     ParseOptions options = {};
+    options.extra_options.Push("-xc");
+    options.extra_options.Push("-std=c11");
 
     String output_filename;
     String output_language;
