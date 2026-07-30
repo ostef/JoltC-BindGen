@@ -87,7 +87,11 @@ void AppendJaiType(const JaiGenerateOptions &options, StringBuilder &builder, Ty
         case Type_Pointer: {
             auto pointer = reinterpret_cast<TypePointer *>(type);
 
-            builder.Append("*");
+            // Function pointers are just functions in Jai (unless it's supposed to be an array! But I'm sure we don't have any occurences of this in JoltC)
+            if (pointer->pointer_to->kind != Type_Function) {
+                builder.Append("*");
+            }
+
             AppendJaiType(options, builder, pointer->pointer_to, indentation);
         } break;
         case Type_Array: {
