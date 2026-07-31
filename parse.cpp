@@ -285,7 +285,7 @@ void ParseFiles(const ParseOptions &options, Database &db) {
                 case CXDiagnostic_Warning: {
                     CXString str = clang_formatDiagnostic(diag, clang_defaultDiagnosticDisplayOptions());
                     const char *cstr = clang_getCString(str);
-                    printf("%s\n", cstr);
+                    fprintf(stderr, "%s\n", cstr);
                 } break;
                 default: break;
             }
