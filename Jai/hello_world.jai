@@ -12,9 +12,10 @@ BroadPhaseLayer :: enum Jolt.BroadPhaseLayer {
 }
 
 main :: () {
-    print("Jolt version ID: %\n", FormatInt.{value=Jolt.GetJoltVersionID(), base=16});
+    print("Jolt version ID: %\n", FormatInt.{value=Jolt.VERSION_ID, base=16});
 
     Jolt.CheckVersionID();
+
     Jolt.RegisterDefaultAllocator();
     Jolt.RegisterDefaultTraceHandler();
     #if Jolt.ENABLE_ASSERTS {
@@ -65,12 +66,15 @@ main :: () {
 
     body_interface := system.GetBodyInterface(system);
 
-    floor_shape_settings := Jolt.BoxShapeSettings.Create();
-    defer floor_shape_settings.Destroy(floor_shape_settings);
+    floor_shape_settings := Jolt.BoxShapeSettings.{
+        density=Jolt.BoxShapeSettings.cDefaultDensity,
+        halfExtent=Jolt.Vec3.Make(100, 1, 100),
+    };
 
-    floor_shape_settings.SetHalfExtent(floor_shape_settings, Jolt.Vec3.Make(100, 1, 100));
+    floor_shape := floor_shape_settings.CreateShape(*floor_shape_settings);
+    defer floor_shape.Release(floor_shape);
 
-    floor_shape := floor_shape_settings.CreateShape(floor_shape_settings);
+    assert(floor_shape.GetRefCount(floor_shape) == 1);
 
     floor_settings := Jolt.BodyCreationSettings.Default();
     floor_settings.position = Jolt.Vec3.Make(0,-1,0);
@@ -82,12 +86,17 @@ main :: () {
     body_interface.AddBody(body_interface, floor.GetID(floor), .Activate);
     print("Created floor: %\n", floor.GetID(floor));
 
-    sphere_shape_settings := Jolt.SphereShapeSettings.Create();
-    defer sphere_shape_settings.Destroy(sphere_shape_settings);
+    assert(floor_shape.GetRefCount(floor_shape) == 2);
 
-    sphere_shape_settings.SetRadius(sphere_shape_settings, 0.5);
+    sphere_shape_settings := Jolt.SphereShapeSettings.{
+        density=Jolt.SphereShapeSettings.cDefaultDensity,
+        radius=0.5,
+    };
 
-    sphere_shape := sphere_shape_settings.CreateShape(sphere_shape_settings);
+    sphere_shape := sphere_shape_settings.CreateShape(*sphere_shape_settings);
+    defer sphere_shape.Release(sphere_shape);
+
+    assert(sphere_shape.GetRefCount(sphere_shape) == 1);
 
     sphere_settings := Jolt.BodyCreationSettings.Default();
     sphere_settings.position = Jolt.Vec3.Make(0,2,0);
@@ -97,6 +106,8 @@ main :: () {
 
     sphere_id := Jolt.BodyInterface.CreateAndAddBody(body_interface, *sphere_settings, .Activate);
     print("Created sphere: %\n", sphere_id);
+
+    assert(sphere_shape.GetRefCount(sphere_shape) == 2);
 
     body_interface.SetLinearVelocity(body_interface, sphere_id, Jolt.Vec3.Make(0,-5,0));
 
