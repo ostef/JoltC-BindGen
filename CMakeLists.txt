@@ -41,10 +41,10 @@ message(STATUS "Found libclang: ${LIBCLANG_LIBRARY}")
 
 set(JOLTC_BINDGEN_SRC_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/core.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/database.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/parse.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Jai/jai.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Core.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Database.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Parse.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Jai/Jai.cpp
 )
 
 add_executable(joltc-bindgen ${JOLTC_BINDGEN_SRC_FILES})
