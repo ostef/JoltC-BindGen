@@ -60,11 +60,18 @@ Struct *ParseStruct(ParseContext &ctx, CXCursor cursor) {
         ctx.db.all_variables.Push(var);
     } else if (is_new) {
         ctx.db.all_structs.Push(s);
-    } else if (clang_isCursorDefinition(cursor)) { // We want the definition of struct to determine where it will be outputted
-        ctx.db.PushExistingStruct(s);
     }
 
     if (clang_isCursorDefinition(cursor)) {
+        if (!is_new) {
+            // We want the definition of struct to determine where it will be outputted
+            ctx.db.PushExistingStruct(s);
+
+            // Update the cursor and source code location
+            s->source_code_range = GetSourceCodeRange(cursor);
+            s->cursor = clang_getCanonicalCursor(cursor);
+        }
+
         auto prev_struct = ctx.parent_struct;
         ctx.parent_struct = s;
         clang_visitChildren(cursor, StructVisitor, &ctx);
