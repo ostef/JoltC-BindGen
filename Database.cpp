@@ -11,6 +11,17 @@ Struct *Database::GetStruct(const String &name) const {
     return nullptr;
 }
 
+void Database::PushExistingStruct(Struct *s) {
+    for (int64_t i = 0; i < all_structs.count; i += 1) {
+        if (all_structs[i] == s) {
+            all_structs.OrderedRemove(i);
+            break;
+        }
+    }
+
+    all_structs.Push(s);
+}
+
 Enum *Database::GetEnum(const String &name) const {
     for (int64_t i = 0; i < all_enums.count; i += 1) {
         if (all_enums[i]->name == name) {

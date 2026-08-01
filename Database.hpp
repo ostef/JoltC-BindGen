@@ -42,6 +42,7 @@ struct Database {
     Array<Type *> all_types;
 
     Struct *GetStruct(const String &name) const;
+    void PushExistingStruct(Struct *s);
     Enum *GetEnum(const String &name) const;
     Typedef *GetTypedef(const String &name) const;
     Function *GetFunction(const String &name) const;

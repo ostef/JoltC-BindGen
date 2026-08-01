@@ -42,7 +42,15 @@ enum CXChildVisitResult StructVisitor(CXCursor cursor, CXCursor parent, CXClient
 Struct *ParseStruct(ParseContext &ctx, CXCursor cursor) {
     enum CXCursorKind kind = clang_getCursorKind(cursor);
 
-    Struct *s = new Struct(cursor);
+    // Handle forward declarations
+    String struct_name = GetDeclName(cursor);
+    Struct *s = ctx.db.GetStruct(struct_name);
+    bool is_new = s == nullptr;
+
+    if (is_new) {
+        s = new Struct(cursor);
+    }
+
     s->is_union = kind == CXCursor_UnionDecl;
 
     if (clang_Cursor_isAnonymous(cursor)) {
@@ -50,14 +58,18 @@ Struct *ParseStruct(ParseContext &ctx, CXCursor cursor) {
         var->type = new TypeStruct(0, s);
 
         ctx.db.all_variables.Push(var);
-    } else {
+    } else if (is_new) {
         ctx.db.all_structs.Push(s);
+    } else if (clang_isCursorDefinition(cursor)) { // We want the definition of struct to determine where it will be outputted
+        ctx.db.PushExistingStruct(s);
     }
 
-    auto prev_struct = ctx.parent_struct;
-    ctx.parent_struct = s;
-    clang_visitChildren(cursor, StructVisitor, &ctx);
-    ctx.parent_struct = prev_struct;
+    if (clang_isCursorDefinition(cursor)) {
+        auto prev_struct = ctx.parent_struct;
+        ctx.parent_struct = s;
+        clang_visitChildren(cursor, StructVisitor, &ctx);
+        ctx.parent_struct = prev_struct;
+    }
 
     return s;
 }
