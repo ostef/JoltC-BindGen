@@ -33,6 +33,12 @@ enum CXChildVisitResult StructVisitor(CXCursor cursor, CXCursor parent, CXClient
         case CXCursor_FieldDecl: {
             ParseVariable(ctx, cursor);
         } break;
+
+        case CXCursor_StructDecl:
+        case CXCursor_UnionDecl: {
+            ParseStruct(ctx, cursor);
+        } break;
+
         default: break;
     }
 
@@ -57,13 +63,17 @@ Struct *ParseStruct(ParseContext &ctx, CXCursor cursor) {
         Variable *var = new Variable(cursor);
         var->type = new TypeStruct(0, s);
 
-        ctx.db.all_variables.Push(var);
+        if (ctx.parent_struct) {
+            ctx.parent_struct->fields.Push(var);
+        } else {
+            ctx.db.all_variables.Push(var);
+        }
     } else if (is_new) {
         ctx.db.all_structs.Push(s);
     }
 
     if (clang_isCursorDefinition(cursor)) {
-        if (!is_new) {
+        if (!is_new && !clang_Cursor_isAnonymous(cursor)) {
             // We want the definition of struct to determine where it will be outputted
             ctx.db.PushExistingStruct(s);
 
