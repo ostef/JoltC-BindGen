@@ -7,10 +7,16 @@ set(CMAKE_CXX_STANDARD_REQUIRED YES)
 set(CMAKE_CXX_EXTENSIONS        OFF)
 
 find_package(LLVM REQUIRED CONFIG
-    NO_CMAKE_ENVIRONMENT_PATH
-    NO_SYSTEM_ENVIRONMENT_PATH
-    NO_CMAKE_PACKAGE_REGISTRY
-    NO_CMAKE_SYSTEM_PACKAGE_REGISTRY
+    HINTS
+        /usr/lib/llvm-22/lib/cmake/llvm
+        /usr/lib/llvm-21/lib/cmake/llvm
+        /usr/lib/llvm-20/lib/cmake/llvm
+        /usr/lib/llvm-19/lib/cmake/llvm
+        /usr/lib/llvm-18/lib/cmake/llvm
+        /usr/lib/llvm-cmake
+        /usr/local/lib/cmake/llvm
+        /opt/homebrew/opt/llvm/lib/cmake/llvm
+    NO_DEFAULT_PATH
 )
 
 if(LLVM_VERSION_MAJOR LESS 20)
