@@ -95,9 +95,7 @@ Quat :: struct {
 
 VERSION_FEATURES :: cast(u64, VERSION_FEATURE_BIT_1) | (VERSION_FEATURE_BIT_2 << 1) | (VERSION_FEATURE_BIT_3 << 2) | (VERSION_FEATURE_BIT_4 << 3) | (VERSION_FEATURE_BIT_5 << 4) | (VERSION_FEATURE_BIT_6 << 5) | (VERSION_FEATURE_BIT_7 << 6) | (VERSION_FEATURE_BIT_8 << 7) | (VERSION_FEATURE_BIT_9 << 8) | (VERSION_FEATURE_BIT_10 << 9) | (VERSION_FEATURE_BIT_11 << 10);
 
-#if OS == .LINUX {
-    JoltC :: #library "./Libs/Linux/libJoltC"; // Replace this with wherever your lib is
-}
+JoltC :: #library "libJoltC"; // Replace this with wherever your lib is
 
 #load "jolt.jai";
 
