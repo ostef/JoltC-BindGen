@@ -99,103 +99,24 @@ JoltC :: #library "libJoltC"; // Replace this with wherever your lib is
 
 #load "jolt.jai";
 
+#import "Basic";
+
+Temp :: inline () -> JoltCAllocator {
+    return .{
+        data=*context,
+
+        AllocateFunc=(data : *void, size : u64) -> *void #c_call {
+            push_context,defer_pop cast(*#Context, data).*;
+            return alloc(xx size ,, temp);
+        },
+
+        FreeFunc=(data : *void, ptr : *void) #c_call {
+            push_context,defer_pop cast(*#Context, data).*;
+            free(ptr ,, temp);
+        },
+    };
+}
+
 CheckVersionID :: () {
-    LogError :: (message : string, location := #caller_location) {
-        info: Log_Info;
-        info.source_identifier = context.log_source_identifier;
-        info.location          = location;
-        info.common_flags      = .ERROR;
-        context.logger(message, context.logger_data, info);
-    }
-
-    if VERSION_ID != GetJoltVersionID() && !context.handling_assertion_failure {
-        bindings_features := cast(EFeatures, VERSION_FEATURES);
-        compiled_features := cast(EFeatures, GetJoltVersionID() >> 24);
-
-        LogError("Jolt version ID mismatch between the compiled library and the bindings. The bindings were either generated with a different Jolt version or different feature defines.");
-
-        if (bindings_features & .DoublePrecision) != (compiled_features & .DoublePrecision) {
-            if compiled_features & .DoublePrecision {
-                LogError("Feature flag DoublePrecision mismatch. The feature was compiled in but not enabled when generating the bindings.");
-            } else {
-                LogError("Feature flag DoublePrecision mismatch. The feature was turned on when generating the bindings but not when compiling JoltC.");
-            }
-        }
-        if (bindings_features & .CrossPlatformDeterministic) != (compiled_features & .CrossPlatformDeterministic) {
-            if compiled_features & .CrossPlatformDeterministic {
-                LogError("Feature flag CrossPlatformDeterministic mismatch. The feature was compiled in but not enabled when generating the bindings.");
-            } else {
-                LogError("Feature flag CrossPlatformDeterministic mismatch. The feature was turned on when generating the bindings but not when compiling JoltC.");
-            }
-        }
-        if (bindings_features & .FloatingPointExceptionsEnabled) != (compiled_features & .FloatingPointExceptionsEnabled) {
-            if compiled_features & .FloatingPointExceptionsEnabled {
-                LogError("Feature flag FloatingPointExceptionsEnabled mismatch. The feature was compiled in but not enabled when generating the bindings.");
-            } else {
-                LogError("Feature flag FloatingPointExceptionsEnabled mismatch. The feature was turned on when generating the bindings but not when compiling JoltC.");
-            }
-        }
-        if (bindings_features & .ProfileEnabled) != (compiled_features & .ProfileEnabled) {
-            if compiled_features & .ProfileEnabled {
-                LogError("Feature flag ProfileEnabled mismatch. The feature was compiled in but not enabled when generating the bindings.");
-            } else {
-                LogError("Feature flag ProfileEnabled mismatch. The feature was turned on when generating the bindings but not when compiling JoltC.");
-            }
-        }
-        if (bindings_features & .ExternalProfile) != (compiled_features & .ExternalProfile) {
-            if compiled_features & .ExternalProfile {
-                LogError("Feature flag ExternalProfile mismatch. The feature was compiled in but not enabled when generating the bindings.");
-            } else {
-                LogError("Feature flag ExternalProfile mismatch. The feature was turned on when generating the bindings but not when compiling JoltC.");
-            }
-        }
-        if (bindings_features & .DebugRenderer) != (compiled_features & .DebugRenderer) {
-            if compiled_features & .DebugRenderer {
-                LogError("Feature flag DebugRenderer mismatch. The feature was compiled in but not enabled when generating the bindings.");
-            } else {
-                LogError("Feature flag DebugRenderer mismatch. The feature was turned on when generating the bindings but not when compiling JoltC.");
-            }
-        }
-        if (bindings_features & .DisableTempAllocator) != (compiled_features & .DisableTempAllocator) {
-            if compiled_features & .DisableTempAllocator {
-                LogError("Feature flag DisableTempAllocator mismatch. The feature was compiled in but not enabled when generating the bindings.");
-            } else {
-                LogError("Feature flag DisableTempAllocator mismatch. The feature was turned on when generating the bindings but not when compiling JoltC.");
-            }
-        }
-        if (bindings_features & .DisableCustomAllocator) != (compiled_features & .DisableCustomAllocator) {
-            if compiled_features & .DisableCustomAllocator {
-                LogError("Feature flag DisableCustomAllocator mismatch. The feature was compiled in but not enabled when generating the bindings.");
-            } else {
-                LogError("Feature flag DisableCustomAllocator mismatch. The feature was turned on when generating the bindings but not when compiling JoltC.");
-            }
-        }
-        if (bindings_features & .ObjectLayer32Bits) != (compiled_features & .ObjectLayer32Bits) {
-            if compiled_features & .ObjectLayer32Bits {
-                LogError("Feature flag ObjectLayer32Bits mismatch. The feature was compiled in but not enabled when generating the bindings.");
-            } else {
-                LogError("Feature flag ObjectLayer32Bits mismatch. The feature was turned on when generating the bindings but not when compiling JoltC.");
-            }
-        }
-        if (bindings_features & .EnableAsserts) != (compiled_features & .EnableAsserts) {
-            if compiled_features & .EnableAsserts {
-                LogError("Feature flag EnableAsserts mismatch. The feature was compiled in but not enabled when generating the bindings.");
-            } else {
-                LogError("Feature flag EnableAsserts mismatch. The feature was turned on when generating the bindings but not when compiling JoltC.");
-            }
-        }
-        if (bindings_features & .ObjectStream) != (compiled_features & .ObjectStream) {
-            if compiled_features & .ObjectStream {
-                LogError("Feature flag ObjectStream mismatch. The feature was compiled in but not enabled when generating the bindings.");
-            } else {
-                LogError("Feature flag ObjectStream mismatch. The feature was turned on when generating the bindings but not when compiling JoltC.");
-            }
-        }
-
-        context.handling_assertion_failure = true;
-        should_break := context.assertion_failed(#location(), "");
-        context.handling_assertion_failure = false;
-
-        debug_break();
-    }
+    assert(VERSION_ID == GetJoltVersionID(), "Jolt version ID mismatch between the compiled library and the bindings (bindings: %, library: %)", cast(EFeatures, VERSION_FEATURES), cast(EFeatures, GetJoltVersionID() >> 24));
 }
