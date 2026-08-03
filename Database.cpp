@@ -491,7 +491,7 @@ SourceCodeRange GetSourceCodeRange(CXSourceRange range) {
 
     const char *filename = clang_getCString(clang_getFileName(file));
 
-    return (SourceCodeRange){
+    return SourceCodeRange{
         .filename=filename,
         .start_line=start_line, .start_character=start_character, .start_offset=start_offset,
         .end_line=end_line, .end_character=end_character, .end_offset=end_offset,
