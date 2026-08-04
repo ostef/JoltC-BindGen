@@ -3,7 +3,7 @@ Bindings generator for [JoltC](https://github.com/ostef/JoltC) using libclang, t
 
 ## Supported languages
 Currently the following languages are supported:
-* Jai: takes advantage of `#as`, `using` and struct namespacing
+* [Jai](https://github.com/ostef/Jolt-Jai): takes advantage of `#as`, `using` and struct namespacing
 
 ## Usage
 Example usage:
